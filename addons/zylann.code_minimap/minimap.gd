@@ -4,6 +4,8 @@ extends ColorRect
 
 var _text_edit = null
 var _dragging = false
+var _char_height = 2
+var _line_spacing = 1
 
 
 func _ready():
@@ -42,7 +44,24 @@ func _scroll(mouse_y):
 
 
 func _pixel_to_line(y):
-	return float(y) / 3.0
+	y *= _get_pan_multiplier()
+	return float(y) / float(_get_line_height())
+
+
+func _get_pan_multiplier():
+	var mvl = _get_max_visible_lines()
+	var lc = get_scrollbar().max_value - get_scrollbar().min_value
+	if lc > mvl:
+		return (lc / mvl)
+	return 1.0
+
+
+func _get_max_visible_lines():
+	return rect_size.y / _get_line_height()
+
+
+func _get_line_height():
+	return _char_height + _line_spacing
 
 
 func _on_scrollbar_value_changed(v):
@@ -73,14 +92,11 @@ func _draw():
 	draw_rect(Rect2(0, get_scrollbar().value * 3.0, rect_size.x, rh), Color(1,1,1,0.1))
 	
 	if _text_edit != null:
-		draw_map(self, _text_edit)
+		draw_map(self, _text_edit, _char_height, _line_spacing)
 
 
-static func draw_map(control, text_edit):
+static func draw_map(control, text_edit, char_h, spacing):
 	var char_w = 1
-	var char_h = 2
-	var spacing = 1
-	var padding = 1
 	
 	var width = control.rect_size.x
 	var height = control.rect_size.y

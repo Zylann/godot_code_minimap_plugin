@@ -13,10 +13,6 @@ config_version=3
 config/name="New Game Project"
 config/icon="res://icon.png"
 
-[editor_plugins]
-
-enabled=PoolStringArray( "zylann.code_minimap" )
-
 [rendering]
 
 environment/default_environment="res://default_env.tres"
