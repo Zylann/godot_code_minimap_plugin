@@ -88,25 +88,31 @@ func _draw():
 		print("No textedit!")
 		return
 	
+	var sb = get_scrollbar()
+	
+	var offset = sb.ratio * rect_size.y * (_get_pan_multiplier() - 1.0)
+	
 	var rh = _get_region_height()
-	draw_rect(Rect2(0, get_scrollbar().value * 3.0, rect_size.x, rh), Color(1,1,1,0.1))
+	draw_rect(Rect2(0, sb.value * 3.0 - offset, rect_size.x, rh), Color(1,1,1,0.1))
 	
 	if _text_edit != null:
-		draw_map(self, _text_edit, _char_height, _line_spacing)
+		draw_map(self, _text_edit, _char_height, _line_spacing, offset)
 
 
-static func draw_map(control, text_edit, char_h, spacing):
+static func draw_map(control, text_edit, char_h, spacing, offset):
 	var char_w = 1
 	
 	var width = control.rect_size.x
 	var height = control.rect_size.y
 	
 	var visible_line_count = int(height) / (char_h + spacing)
-
-	var line_height = char_h + spacing
-	control.draw_rect(Rect2(0, text_edit.cursor_get_line() * line_height, width, line_height), Color(0.7,0.7,0.7,1.0))
 	
-	var y = 0
+	# TODO Optimize out drawing region
+	
+	var line_height = char_h + spacing
+	control.draw_rect(Rect2(0, text_edit.cursor_get_line() * line_height - offset, width, line_height), Color(0.7,0.7,0.7,1.0))
+	
+	var y = -offset
 	for i in text_edit.get_line_count():
 		
 		if text_edit.is_folded(i):
@@ -116,7 +122,7 @@ static func draw_map(control, text_edit, char_h, spacing):
 		line = line.to_utf8()
 		var x = 0
 		
-		for j in range(len(line)):
+		for j in len(line):
 			
 			if x >= width:
 				break
